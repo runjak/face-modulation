@@ -1,24 +1,28 @@
 import * as faceApi from 'face-api.js';
 
-async function loadModel() {
-  await faceApi.loadSsdMobilenetv1Model('/models');
-  // accordingly for the other models:
-  // await faceApi.loadTinyFaceDetectorModel('/models')
-  // await faceApi.loadMtcnnModel('/models')
-  // await faceApi.loadFaceLandmarkModel('/models')
-  // await faceApi.loadFaceLandmarkTinyModel('/models')
-  // await faceApi.loadFaceRecognitionModel('/models')
-  // await faceApi.loadFaceExpressionModel('/models')
+const models = {
+  SsdMobileNetV1: 'loadSsdMobilenetv1Model',
+  TinyFaceDetector: 'loadTinyFaceDetectorModel',
+  Mtcnn: 'loadMtcnnModel',
+  FaceLandmark: 'loadFaceLandmarkModel',
+  FaceLandmarkTiny: 'loadFaceLandmarkTinyModel',
+  FaceRecognition: 'loadFaceRecognitionModel',
+  FaceExpression: 'loadFaceExpressionModel',
+};
+
+async function loadModel(models, path = '/models') {
+  await Promise.all(models.map(model => faceApi[model](path)));
 }
 
 export async function detectFaces(source) {
-  console.log('detectFaces(', source, ')');
+  return; // FIXME DISABLE BELOW FOR NOW
 
-  await loadModel();
+  await loadModel([
+    models.SsdMobileNetV1,
+    models.FaceExpression,
+  ]);
 
-  console.log('model loaded.');
-
-  const things = await faceApi.detectAllFaces(source);
+  const things = await faceApi.detectAllFaces(source).withFaceExpressions();
 
   console.log('got things', things);
 }
